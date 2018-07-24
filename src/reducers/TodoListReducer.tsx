@@ -1,22 +1,22 @@
 import { TodoListAction } from '../actions/TodoList';
 import { ADD_ITEM, REMOVE_ITEM } from '../constants/Actions';
-import { ITodoItem, ITodoListState } from '../store';
+import { ITodoListState } from '../store';
 
-export const TodoListReducer = (state: ITodoListState, action: TodoListAction): ITodoListState => {
-  let newItems: Map<string, ITodoItem> = new Map(state.items);
-
+export function TodoListReducer(state: ITodoListState, action: TodoListAction): ITodoListState {
   switch (action.type) {
     case ADD_ITEM:
-      const item: ITodoItem = action.payload;
-      newItems.set(item.id, item);
-      return { items: newItems};
+      return { ...state, [action.payload]: false };
 
     case REMOVE_ITEM:
-      const itemId: string = action.payload;
-      newItems.delete(itemId);
-      return {items: newItems};
+      return Object
+        .keys(state)
+        .filter(item => (item !== action.payload))
+        .reduce((newState, item) => {
+          newState[item] = state[item];
+          return newState;
+        }, {});
 
     default:
       return state;
   }
-};
+}

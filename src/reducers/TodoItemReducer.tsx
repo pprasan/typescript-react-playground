@@ -1,32 +1,25 @@
-import { ITodoItem, ITodoListState } from '../store';
+import { ITodoListState } from '../store';
 import { TodoItemAction } from '../actions/TodoItem';
 import { CHECK_ITEM, UNCHECK_ITEM } from '../constants/Actions';
 
-export const TodoItemReducer = (state: ITodoListState, action: TodoItemAction): ITodoListState => {
-  let items: Map<string, ITodoItem> = new Map(state.items);
-  let itemId: string;
-  let item;
-
+export function TodoItemReducer(state: ITodoListState, action: TodoItemAction): ITodoListState {
   switch(action.type) {
     case CHECK_ITEM:
-      itemId = action.payload;
-      item = items.get(itemId);
-      if(item !== undefined) {
-        item.checked = true;
-        items.set(itemId, item);
-      }
-      return {items: items};
+      return getUpdatedState(state, action.payload, true);
 
     case UNCHECK_ITEM:
-      itemId = action.payload;
-      item = items.get(itemId);
-      if(item !== undefined) {
-        item.checked = false;
-        items.set(itemId, item);
-      }
-      return {items: items};
+      return getUpdatedState(state, action.payload, false);
 
     default:
       return state;
   }
-};
+}
+
+function getUpdatedState(state: ITodoListState, itemToUpdate: string, newValue: boolean): ITodoListState {
+  if(state.hasOwnProperty(itemToUpdate)) {
+    return { ...state, [itemToUpdate]: newValue};
+  }
+  else {
+    throw new Error("Item " + itemToUpdate + " doesn't exist in the Todo List");
+  }
+}
